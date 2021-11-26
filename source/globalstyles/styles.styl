@@ -3,9 +3,21 @@
 /*==========================================================
 Color Theme
 ==========================================================*/
-cd-foreground = white
+cd-background = white
 cd-flash = purple
-cd-background = black
+cd-foreground = black
+
+cd-royal-purple = #603F83
+cd-island-green = #2BAE66
+cd-cherry-tomato =  #E94B3C
+cd-space-cherry = #990011
+cd-cyber-yellow = #FDD20E
+cd-bright-red = #F93822
+cd-lemon-tonic = #FCF951
+cd-princess-blue = #00539C
+cd-raspberry-pink = #D64161
+cd-pink-salt =  #FAD0C9
+
 
 /*==========================================================
 Global Variables
@@ -26,10 +38,26 @@ body
     height 100vh
     width 100%
     overflow hidden
-
+    transition background 0.5s
 h1
     font-size: 17pt
 h2
     font-size: 15pt
 p
     font-size: 12pt
+
+body.muladhara
+    background-color:cd-space-cherry 
+body.svadhistana
+    background-color cd-bright-red
+body.manipura
+    background-color cd-lemon-tonic
+body.anahata
+    background-color cd-island-green
+body.vissudha
+    background-color cd-princess-blue
+body.ajna
+    background-color cd-royal-purple
+body.sahasrara
+    background-color cd-pink-salt
+

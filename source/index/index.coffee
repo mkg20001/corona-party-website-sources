@@ -4,10 +4,32 @@ domconnect.initialize()
 
 global.allModules = Modules
 
+
+timeMS = 1000
+classIndex = -1
+
+classes = [
+    "muladhara",
+    "svadhistana",
+    "manipura",
+    "anahata",
+    "vissudha",
+    "ajna",
+    "sahasrara"
+]
+
+changeBackround = ->
+    if classIndex >= 0 then document.body.classList.remove(classes[classIndex])
+    
+    classIndex  = (classIndex + 1) % classes.length
+    document.body.classList.add(classes[classIndex])
+    return
+
+
 ############################################################
 appStartup = ->
-    ## which modules shall be kickstarted?
-    # Modules.appcoremodule.startUp()
+    setInterval(changeBackround, timeMS)
+    Modules.audioanalysermodule.visualize()
     return
 
 ############################################################
