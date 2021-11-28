@@ -30,6 +30,32 @@ maximaArray = null
 lastTime = null
 objectStorage = []
 
+cuteVirus = null
+
+svgToImage = (id) ->
+  # get svg
+  svg = document.getElementById(id)
+
+  # make image
+  img = new Image()
+
+  # get svg data
+  xml = new XMLSerializer().serializeToString(svg)
+
+  # make it base64
+  svg64 = btoa(xml)
+  b64Start = 'data:image/svg+xml;base64,'
+
+  # prepend a "header"
+  image64 = b64Start + svg64;
+
+  img.isReady = false
+  img.src = image64
+  img.onload = ->
+    img.isReady = true
+
+  img
+
 ############################################################
 colors = [
     {
@@ -111,6 +137,8 @@ visualizationmodule.initialize = ->
     log "visualizationmodule.initialize"
     analyser = allModules.audioanalysermodule
 
+    cuteVirus = svgToImage('cute-virus')
+
     ctx = visualsCanvas.getContext("2d")
     visualsCanvas.width = WIDTH
     visualsCanvas.height = HEIGHT
@@ -137,6 +165,7 @@ createObjectsMoveObjects = (diff) ->
     h = 10
 
     objectStorage.push({
+      t: if Math.random() > .5 then 'corona' else 'confetti'
       x: randNum(-w, visualsCanvas.width + (w / 2))
       y: randNum(-h, 0)
       s: randNum(0.1, 1),
@@ -151,9 +180,22 @@ createObjectsMoveObjects = (diff) ->
 drawCoronaThings = (frequencyArray, diff) ->
   createObjectsMoveObjects(diff)
 
+  # TODO fix confetti coloring
+  # _globalCompositeOperation = ctx.globalCompositeOperation
+  # ctx.globalCompositeOperation = 'source-in'
+
   for object in objectStorage
     ctx.fillStyle = object.color
-    ctx.fillRect(object.x, object.y, object.w, object.h)
+    switch object.t
+      when 'corona'
+        # ctx.drawImage(cuteVirus, object.x, object.y, object.w, object.h)
+        ctx.drawImage(cuteVirus, object.x, object.y, object.w, object.h)
+      when 'confetti'
+        ctx.fillRect(object.x, object.y, object.w, object.h)
+
+  # ctx.globalCompositeOperation = _globalCompositeOperation
+
+  return objectStorage
 
 
 ############################################################
@@ -173,7 +215,7 @@ visualizationUpdate = ->
     # drawBarChart(frequencyArray)
     drawSoundColoredRect(frequencyArray)
     drawMirroredBarChart(frequencyArray)
-    
+
     lastTime = currentTime
     return
 
@@ -185,9 +227,9 @@ drawCenteredLine = (data) ->
 
     ctx.beginPath()
     sliceWidth = WIDTH * 1.0 / bufferLength
-    
+
     x = 0
-    i = 0 
+    i = 0
 
     while(i++ < bufferLength)
         v = data[i] / 128.0
@@ -205,7 +247,7 @@ drawCenteredLine = (data) ->
 ############################################################
 drawBarChart = (data) ->
     x = 0
-    i = 0 
+    i = 0
 
     while(i++ < bufferLength)
         barHeight = data[i];
@@ -223,20 +265,20 @@ drawBarChart = (data) ->
 
 drawMirroredBarChart = (data) ->
     x = 0
-    i = 0 
+    i = 0
 
     while(i++ < bufferLength)
         barHeight = data[i]
 
         ctx.fillStyle = 'rgb(' + (barHeight+100) + ',50,50)'
-        
+
         ctx.fillRect(
             halfX - x,
             HEIGHT-barHeight/2,
             mirroredBarWidth,
             barHeight/2
         )
-        
+
         ctx.fillRect(
             halfX + x,
             HEIGHT-barHeight/2,
@@ -250,7 +292,7 @@ drawMirroredBarChart = (data) ->
 ############################################################
 drawSoundColoredRect = (data) ->
     loudness = 0
-    
+
     r = 0
     g = 0
     b = 0
@@ -296,7 +338,7 @@ visualizationmodule.start = ->
 
     barWidth = (WIDTH / bufferLength) * 2.5
     mirroredBarWidth = (WIDTH / bufferLength) * 1.25
-    
+
     byteFreqRange = maxFreq / bufferLength
     byteFreq = byteFreqRange / 2
     log byteFreqRange
@@ -310,5 +352,8 @@ visualizationmodule.start = ->
 
     visualizationUpdate()
     return
+
+visualizationmodule.newVirusObject = ->
+
 
 module.exports = visualizationmodule

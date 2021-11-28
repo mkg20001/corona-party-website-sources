@@ -12,11 +12,15 @@ print = (arg) -> console.log(arg)
 ########################################################
 configmodule.initialize = ->
     log "configmodule.initialize"
-    return    
+    return
 
 ########################################################
 #region exposedProperties
 configmodule.prop = true
+configmodule.appId = 'corona-party'
+configmodule.p2pBootstrapPeers = [
+  # libp2p peers to connect to
+]
 
 #endregion
 

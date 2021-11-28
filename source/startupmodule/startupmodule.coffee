@@ -27,7 +27,7 @@ classes = [
 ############################################################
 changeBackround = ->
     if classIndex >= 0 then document.body.classList.remove(classes[classIndex])
-    
+
     classIndex  = (classIndex + 1) % classes.length
     document.body.classList.add(classes[classIndex])
     return
@@ -37,6 +37,9 @@ startupmodule.initialize = ->
     log "startupmodule.initialize"
     return
 
+# TODO: make this part of url (hash parameter?)
+partyId = '123456'
+
 startupmodule.startUp = ->
     setInterval(changeBackround, timeMS)
     allModules.audioanalysermodule.start()
@@ -44,7 +47,9 @@ startupmodule.startUp = ->
     # allModules.pianomodule.connect(analyser)
     allModules.visualizationmodule.start()
 
+    allModules.chatmodule.start partyId
+
     return
 
-    
+
 module.exports = startupmodule
