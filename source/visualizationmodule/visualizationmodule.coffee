@@ -43,17 +43,17 @@ visualizationmodule.initialize = ->
 ############################################################
 visualizationUpdate = ->
     requestAnimationFrame(visualizationUpdate)
+
     analyser.fillTimeDomainData(timeDomainArray)
     analyser.fillFrequencyData(frequencyArray)
 
-
     ctx.clearRect(0, 0, WIDTH, HEIGHT)
 
-    drawCenteredLine(timeDomainArray)
+    # drawCenteredLine(timeDomainArray)
 
-    drawBarChart(frequencyArray)
+    # drawBarChart(frequencyArray)
     # drawSoundColoredRect(frequencyArray)
-    # drawMirroredBarChart(frequencyArray)
+    drawMirroredBarChart(frequencyArray)
     return
 
 
@@ -83,42 +83,47 @@ drawCenteredLine = (data) ->
 
 ############################################################
 drawBarChart = (data) ->
-    x = 0;
+    x = 0
     i = 0 
 
     while(i++ < bufferLength)
         barHeight = data[i];
 
-        ctx.fillStyle = 'rgb(' + (barHeight+100) + ',50,50)';
-        ctx.fillRect(x,HEIGHT-barHeight/2,barWidth,barHeight/2);
+        ctx.fillStyle = 'rgb(' + (barHeight+100) + ',50,50)'
+        ctx.fillRect(
+            x,
+            HEIGHT-barHeight/2,
+            barWidth,
+            barHeight/2
+        )
 
-        x += barWidth + 1;
+        x += barWidth + 1
     return
 
 drawMirroredBarChart = (data) ->
-    x = 0;
+    x = 0
     i = 0 
 
     while(i++ < bufferLength)
-        barHeight = data[i];
+        barHeight = data[i]
 
-        ctx.fillStyle = 'rgb(' + (barHeight+100) + ',50,50)';
+        ctx.fillStyle = 'rgb(' + (barHeight+100) + ',50,50)'
         
         ctx.fillRect(
             halfX - x,
             HEIGHT-barHeight/2,
             mirroredBarWidth,
             barHeight/2
-        );
+        )
         
         ctx.fillRect(
             halfX + x,
             HEIGHT-barHeight/2,
             mirroredBarWidth,
             barHeight/2
-        );
+        )
 
-        x += mirroredBarWidth + 1;
+        x += mirroredBarWidth + 1
     return
 
 ############################################################
@@ -156,6 +161,7 @@ drawSoundColoredRect = (data) ->
 
     maximaArray[mi] = 0
 
+
     ctx.fillStyle = 'rgba('+r+','+g+','+b+','+a+')';
     ctx.fillRect(0,0, WIDTH, HEIGHT);
     return
@@ -166,6 +172,15 @@ drawSoundColoredRect = (data) ->
 ############################################################
 visualizationmodule.start = ->
     bufferLength = analyser.getBufferLength()
+
+    barWidth = (WIDTH / bufferLength) * 2.5
+    mirroredBarWidth = (WIDTH / bufferLength) * 1.25
+    
+    byteFreqRange = maxFreq / bufferLength
+    byteFreq = byteFreqRange / 2
+    log byteFreqRange
+    log byteFreq
+
     timeDomainArray = new Uint8Array(bufferLength)
     frequencyArray = new Uint8Array(bufferLength)
     maximaArray = new Uint16Array(bufferLength)

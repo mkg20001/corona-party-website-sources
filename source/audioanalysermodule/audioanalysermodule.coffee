@@ -19,14 +19,6 @@ analyser = null
 audioanalysermodule.initialize = ->
     log "audioanalysermodule.initialize"
     audio = allModules.audiomodule    
-    
-    # bufferLength = analyser.frequencyBinCount
-    # barWidth = (WIDTH / bufferLength) * 2.5
-    # mirroredBarWidth = (WIDTH / bufferLength) * 1.25
-    
-    # byteFreqRange = maxFreq / bufferLength
-    # byteFreq = byteFreqRange / 2
-    # log byteFreq
     return
 
 
