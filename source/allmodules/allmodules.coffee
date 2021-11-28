@@ -7,6 +7,7 @@ import debugmodule from "./debugmodule"
 import micbuttonmodule from "./micbuttonmodule"
 import pianomodule from "./pianomodule"
 import startupmodule from "./startupmodule"
+import systemsoundbuttonmodule from "./systemsoundbuttonmodule"
 import visualizationmodule from "./visualizationmodule"
 
 Modules = {
@@ -19,6 +20,7 @@ Modules = {
     micbuttonmodule,
     pianomodule,
     startupmodule,
+    systemsoundbuttonmodule,
     visualizationmodule,
 }
 

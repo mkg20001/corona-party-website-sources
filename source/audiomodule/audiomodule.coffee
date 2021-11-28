@@ -23,6 +23,11 @@ micGain = null
 micFilter = null
 micConvolver = null
 
+systemSound = null 
+systemSoundGain = null
+# micFilter = null
+# micConvolver = null
+
 ############################################################
 audiomodule.initialize = ->
     log "audiomodule.initialize"
@@ -102,5 +107,49 @@ audiomodule.destroyMic = ->
     log "audiomodule.destroyMic"
     log "Not Implemented yet!"
     return
+    
+############################################################
+audiomodule.createSystemSound = ->
+    log "audiomodule.createSystemSound"
+
+    systemSoundGain = ctx.createGain()
+    
+    constraintsMoz = {
+        audio: {
+           mediaSource: 'audioCapture'
+        }
+    }
+    constraintsChrome = {
+        audio: {
+            mandatory: {
+                chromeMediaSource: 'system',
+            }        
+        }
+    }
+
+    try
+        if navigator.mozGetUserMedia?
+            stream = await navigator.mozGetUserMedia(constraints)
+        else if chrome?
+            streamId = await chrome.desktopCapture.chooseDesktopMedia(['screen', 'window'])
+            constraintsChrome.audio.chromeMediaSourceId = streamId
+            stream = await navigator.webkitGetUserMedia(constraintsChrome)
+        else
+            throw new Error("Neither Firefox nor Chrome Environment detected!")
+
+        systemSound = ctx.createMediaStreamSource(stream)
+        systemSound.connect(systemSoundGain)
+        systemSoundGain.connect(analyser)
+
+    catch err
+        log('Error on getUserMedia: ' + err)
+    return
+
+############################################################
+audiomodule.destroySystemSound = ->
+    log "audiomodule.destroySystemSound"
+    log "Not Implemented yet!"
+    return
+
     
 module.exports = audiomodule
