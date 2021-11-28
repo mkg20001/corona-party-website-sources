@@ -31,6 +31,82 @@ lastTime = null
 objectStorage = []
 
 ############################################################
+colors = [
+    {
+        r: 255
+        g: 0 
+        b: 0
+        hex: "#ff0000"
+    },
+    {
+        r: 255
+        g: 127
+        b: 0
+        "#FF7F00"
+    },
+    {
+        r: 255
+        g: 255 
+        b: 0
+        hex: "#FFFF00"
+    },
+    {
+        r: 51
+        g: 204
+        b: 51
+        hex: "#ff0000"
+    },
+    {
+        r: 195
+        g: 242 
+        b: 255
+        hex: "#C3F2FF"
+    },
+    {
+        r: 142
+        g: 201 
+        b: 255
+        hex: "#ff0000"
+    },
+    {
+        r: 127
+        g: 139
+        b: 253
+        hex: "#7F8BFD"
+    },
+    {
+        r: 144
+        g: 0 
+        b: 255
+        hex: "#9000FF"
+    },
+    {
+        r: 187
+        g: 117
+        b: 252
+        hex: "#BB75FC"
+    },
+    {
+        r: 183
+        g: 70
+        b: 139
+        hex: "#B7468B"
+    },
+    {
+        r: 169
+        g: 103
+        b: 124
+        hex: "#A9677C"
+    },
+    {
+        r: 171
+        g: 0 
+        b: 52
+        hex: "#AB0034"
+    }
+]
+
+############################################################
 visualizationmodule.initialize = ->
     log "visualizationmodule.initialize"
     analyser = allModules.audioanalysermodule
@@ -49,7 +125,7 @@ randNum = (min, max) ->
 randHex = ->
   return Math.floor(randNum(0, 256)).toString(16)
 
-randColor = () ->
+randColor = ->
   return '#' + "#{randHex()}#{randHex()}#{randHex()}"
 
 createObjectsMoveObjects = (diff) ->
