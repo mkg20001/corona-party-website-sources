@@ -17,7 +17,6 @@ maxFreq = 24000
 WIDTH = 2048
 HEIGHT = 600
 
-
 halfX = WIDTH / 2
 barWidth = null
 mirroredBarWidth = null
@@ -27,6 +26,9 @@ bufferLength = null
 timeDomainArray = null
 frequencyArray = null
 maximaArray = null
+
+lastTime = null
+objectStorage = []
 
 ############################################################
 visualizationmodule.initialize = ->
@@ -38,7 +40,45 @@ visualizationmodule.initialize = ->
     visualsCanvas.height = HEIGHT
 
     return
-    
+
+
+############################################################
+randNum = (min, max) ->
+  return Math.random() * (max - min) + min
+
+randHex = ->
+  return Math.floor(randNum(0, 256)).toString(16)
+
+randColor = () ->
+  return '#' + "#{randHex()}#{randHex()}#{randHex()}"
+
+createObjectsMoveObjects = (diff) ->
+  objectStorage = objectStorage.filter (d) ->
+      return d.y < visualsCanvas.height - d.h
+
+  while objectStorage.length < 100
+    w = 10
+    h = 10
+
+    objectStorage.push({
+      x: randNum(-w, visualsCanvas.width + (w / 2))
+      y: randNum(-h, 0)
+      s: randNum(0.1, 1),
+      w: w
+      h: h
+      color: randColor()
+    })
+
+  for object in objectStorage
+      object.y += diff * object.s
+
+drawCoronaThings = (frequencyArray, diff) ->
+  createObjectsMoveObjects(diff)
+
+  for object in objectStorage
+    ctx.fillStyle = object.color
+    ctx.fillRect(object.x, object.y, object.w, object.h)
+
 
 ############################################################
 visualizationUpdate = ->
@@ -49,11 +89,16 @@ visualizationUpdate = ->
 
     ctx.clearRect(0, 0, WIDTH, HEIGHT)
 
+    currentTime = Date.now()
+    diff = currentTime - lastTime
+    drawCoronaThings(frequencyArray, diff)
     # drawCenteredLine(timeDomainArray)
 
     # drawBarChart(frequencyArray)
-    # drawSoundColoredRect(frequencyArray)
+    drawSoundColoredRect(frequencyArray)
     drawMirroredBarChart(frequencyArray)
+    
+    lastTime = currentTime
     return
 
 
@@ -133,12 +178,12 @@ drawSoundColoredRect = (data) ->
     r = 0
     g = 0
     b = 0
-    a = 1
+    a = 0
 
     i = 0
     mi = 0
 
-    ctx.fillStyle = 'rgb(0,0,0)';
+    ctx.fillStyle = 'rgb(0,0,0)'
     x = 0
     while(i++ < bufferLength)
         loudness += data[i]
@@ -149,13 +194,13 @@ drawSoundColoredRect = (data) ->
                 0,
                 mirroredBarWidth,
                 HEIGHT
-            );
+            )
             ctx.fillRect(
                 halfX - x,
                 0,
                 mirroredBarWidth,
                 HEIGHT
-            );
+            )
 
         x += mirroredBarWidth + 1;
 
@@ -184,6 +229,8 @@ visualizationmodule.start = ->
     timeDomainArray = new Uint8Array(bufferLength)
     frequencyArray = new Uint8Array(bufferLength)
     maximaArray = new Uint16Array(bufferLength)
+
+    lastTime = Date.now()
 
     visualizationUpdate()
     return

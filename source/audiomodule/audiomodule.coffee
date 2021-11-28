@@ -34,7 +34,7 @@ audiomodule.initialize = ->
 audiomodule.createSineOscillator = (freq) ->
     log "audiomodule.createSineOscillator"
     osc = ctx.createOscillator()
-    osc.type = "sawtooth"
+    # osc.type = "sawtooth"
     #Type: "sine"(default), "square", "sawtooth", "triangle" and "custom"
     g = ctx.createGain()
     g.gain.setValueAtTime(0, ctx.currentTime)
