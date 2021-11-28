@@ -89,10 +89,10 @@ audiomodule.createMic = ->
     try
         stream = await navigator.mediaDevices.getUserMedia(constraints)
         mic = ctx.createMediaStreamSource(stream)
-        source.connect(biquadFilter)
-        biquadFilter.connect(gainNode)
-        convolver.connect(gainNode)
-        gainNode.connect(analyser)
+        mic.connect(micFilter)
+        micFilter.connect(micGain)
+        micConvolver.connect(micGain)
+        micGain.connect(analyser)
     catch err
         log('Error on getUserMedia: ' + err)
     return

@@ -16,7 +16,7 @@ micOn = false
 ############################################################
 micbuttonmodule.initialize = () ->
     log "micbuttonmodule.initialize"
-    audio = allModules.audimodule
+    audio = allModules.audiomodule
     micbutton.addEventListener("click", micButtonClicked)
     return
 
