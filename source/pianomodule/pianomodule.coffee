@@ -13,7 +13,7 @@ print = (arg) -> console.log(arg)
 audio = null
 
 numKeys = 12
-octave = 2
+octave = 4
 
 ############################################################
 keyCodeToIndex =
