@@ -10,19 +10,25 @@ print = (arg) -> console.log(arg)
 #endregion
 
 # TODO: peer id based user color for spoofing and shit and put nick in message
-# TODO: common nick & id format function
-# TODO: cleanup old presences after some time
-# TODO: nick storage and sync (use last nick recieved per peer and store kv)
 # TODO: friends list?
 
-nick = window.localStorage.getItem('chat.nick')
-present = {}
-channel = null
 day = require 'dayjs'
 relativeTime = require('dayjs/plugin/relativeTime')
 day.extend(relativeTime)
 
+# self state
+nick = window.localStorage.getItem('chat.nick')
+us = null
+
+# channel state
+channel = null
 messages = []
+present = {}
+id2nick = {}
+
+# helper
+fmtNick = (id) ->
+  "#{id2nick[id] || '(unnamed)'} #{id.substr(2, 18)}"
 
 cmds = {
   help:
@@ -54,7 +60,7 @@ render = ->
   chatMessages.innerHTML = ''
 
   for msg in messages
-    txt = document.createTextNode("<#{msg.nick || "(unnamed)"} - #{msg.sender}> #{msg.msg}")
+    txt = document.createTextNode("<#{if msg.system then '#system#' else fmtNick msg.sender}> #{msg.msg}")
     p = document.createElement "p"
     p.appendChild txt
     chatMessages.appendChild p
@@ -64,11 +70,16 @@ renderPresence = ->
   pOut.innerHTML = ''
 
   for id, state of present
+    # clear out old presences
+    if Date.now() - state.lastSeen > 60 * 60 * 1000
+      delete present[id]
+      continue
+
     if Date.now() - state.lastSeen > 10 * 1000 and not state.inactive
       state.inactive = true
-      sysmsg "#{state.nick || '(unnamed)'} #{state.id} has left"
+      sysmsg "#{fmtNick id} has left"
 
-    txt = document.createTextNode "#{state.nick || "(unnamed)"} #{state.id}"
+    txt = document.createTextNode "#{fmtNick id}"
     p = document.createElement "p"
     p.appendChild txt
     p.classList.add('present')
@@ -84,21 +95,22 @@ renderPresence = ->
     pOut.appendChild p
 
 handler = (sender, data) ->
+  id2nick[sender.toB58String()] = data.nick
+
   messages.push {
-    sender: sender.toB58String().slice(2, 18)
+    sender: sender.toB58String()
     msg: data.msg
-    nick: data.nick
   }
   messages = messages.slice 0, 1024
   render()
 
 handlerPresence = (sender, data) ->
-  if not present[sender.toB58String()] or present[sender.toB58String()].ghost
-    sysmsg "#{data.nick || '(unnamed)'} #{sender.toB58String().slice(2, 18)} has #{if present[sender.toB58String()] then 'returned' else 'joined'}"
+  id2nick[sender.toB58String()] = data.nick
+
+  if not present[sender.toB58String()] or present[sender.toB58String()].inactive
+    sysmsg "#{fmtNick sender.toB58String()} has #{if present[sender.toB58String()] then 'returned' else 'joined'}"
 
   present[sender.toB58String()] = {
-    id: sender.toB58String().slice(2, 18)
-    nick: data.nick
     lastSeen: Date.now()
   }
   renderPresence()
@@ -120,19 +132,19 @@ chatmodule.initialize = () ->
 
 sysmsg = (msg) ->
   messages.push {
-    sender: '#'
-    nick: 'system'
+    system: true
     msg
   }
   render()
 
 chatmodule.start = (channelId) ->
+    us = allModules.peertopeermodule.getNode().peerId.toB58String()
     channel = await allModules.eventexchangemodule.channel channelId
     channel.handle "chat", handler
     channel.handle "chat.presence", handlerPresence
     sysmsg "Connected via pubsub to #{channelId} as #{nick || '(unnamed)'}"
     chatInput.disabled = false
-    # call immediatly, this looks better
+    # call immediatly to display self right away, this looks better
     showPresence()
 
 chatmodule.chat = (msg) ->
@@ -158,7 +170,11 @@ chatmodule.stop = ->
 
 chatmodule.nick = (_nick) ->
   window.localStorage.setItem 'chat.nick', _nick
+  id2nick[us] = _nick
   nick = _nick
+  # update nick in chat
+  render()
+  renderPresence()
 
 chatmodule.getPresent = ->
   present
