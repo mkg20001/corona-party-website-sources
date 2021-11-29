@@ -20,11 +20,13 @@ day.extend(relativeTime)
 nick = window.localStorage.getItem('chat.nick')
 us = null
 
-# channel state
+# channel state - init everything as null so we detect uninitialized changes
 channel = null
-messages = []
-present = {}
-id2nick = {}
+messages = null
+present = null
+id2nick = null
+# unique session id for checking if a message is from "back then" or from this session
+session = null
 
 # helper
 fmtNick = (id) ->
@@ -54,18 +56,21 @@ cmds = {
 showPresence = ->
   if channel
     channel.emit "chat.presence", {nick}
-    renderPresence()
 
-presence = setInterval(showPresence, 1000)
+presence = setInterval(showPresence, 5000)
 
 
 render = ->
   chatMessages.innerHTML = ''
 
   for msg in messages
-    txt = document.createTextNode("<#{if msg.system then '#system#' else fmtNick msg.sender}> #{msg.msg}")
+    txt = document.createTextNode "<#{if msg.system then '#system#' else fmtNick msg.sender} @ #{day(msg.ts).fromNow()}> #{msg.msg}"
     p = document.createElement "p"
     p.appendChild txt
+
+    if msg.session != session
+      p.classList.add('inactive')
+
     chatMessages.appendChild p
 
 renderPresence = ->
@@ -103,9 +108,13 @@ handler = (sender, data) ->
   messages.push {
     sender: sender.toB58String()
     msg: data.msg
+    ts: Date.now()
+    session
   }
   messages = messages.slice 0, 1024
-  render()
+
+  saveState 'messages', messages
+  saveState 'id2nick', id2nick
 
 handlerPresence = (sender, data) ->
   id2nick[sender.toB58String()] = data.nick
@@ -116,7 +125,9 @@ handlerPresence = (sender, data) ->
   present[sender.toB58String()] = {
     lastSeen: Date.now()
   }
-  renderPresence()
+
+  saveState 'present', present, false
+  saveState 'id2nick', id2nick
 
 chatkeypress = () ->
     if not chatInput.value
@@ -137,18 +148,54 @@ sysmsg = (msg) ->
   messages.push {
     system: true
     msg
+    ts: Date.now()
+    session
   }
-  render()
+  saveState 'messages', messages
+
+_state = null
+
+saveState = (key, value, persistent = true) ->
+  (if persistent then _state.save else _state.set) "#{channel.id}.#{key}", value, true
+
+loadState = (key, def) ->
+  _state.load("#{channel.id}.#{key}") || def
+
+listenState = (key, fnc) ->
+  trueFnc = () -> true
+  _state.setChangeDetectionFunction "#{channel.id}.#{key}", trueFnc
+  _state.addOnChangeListener "#{channel.id}.#{key}", fnc
 
 chatmodule.start = (channelId) ->
-    us = allModules.peertopeermodule.getNode().peerId.toB58String()
+    _state = allModules.statemodule
+
     channel = await allModules.eventexchangemodule.channel channelId
+
+    session = String(Math.random())
+    messages = loadState 'messages', []
+    present = {}
+    id2nick = loadState 'id2nick', {}
+
+    us = allModules.peertopeermodule.getNode().peerId.toB58String()
+
     channel.handle "chat", handler
     channel.handle "chat.presence", handlerPresence
-    sysmsg "Connected via pubsub to #{channelId} as #{nick || '(unnamed)'}"
+
     chatInput.disabled = false
+
+    sysmsg "Connected via pubsub to #{channelId} as #{nick || '(unnamed)'}"
+
+    listenState 'messages', render
+    listenState 'present', renderPresence
+    listenState 'id2nick', () ->
+      render()
+      renderPresence()
+
     # call immediatly to display self right away, this looks better
     showPresence()
+    # render everything the first time
+    render()
+    renderPresence()
 
 chatmodule.chat = (msg) ->
     if not channel
@@ -162,6 +209,7 @@ chatmodule.chat = (msg) ->
       cmds[cmd].cmd(s.slice(1).join(' '))
       return
 
+    # this will trigger rendering aswell
     channel.emit "chat", {msg, nick}
 
 chatmodule.stop = ->
@@ -175,9 +223,8 @@ chatmodule.nick = (_nick) ->
   window.localStorage.setItem 'chat.nick', _nick
   id2nick[us] = _nick
   nick = _nick
-  # update nick in chat
-  render()
-  renderPresence()
+
+  saveState 'id2nick', id2nick
 
 chatmodule.getPresent = ->
   present
