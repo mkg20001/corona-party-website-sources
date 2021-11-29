@@ -10,6 +10,7 @@ import micbuttonmodule from "./micbuttonmodule"
 import peertopeermodule from "./peertopeermodule"
 import pianomodule from "./pianomodule"
 import startupmodule from "./startupmodule"
+import statemodule from "./statemodule"
 import systemsoundbuttonmodule from "./systemsoundbuttonmodule"
 import visualizationmodule from "./visualizationmodule"
 
@@ -26,6 +27,7 @@ Modules = {
     peertopeermodule,
     pianomodule,
     startupmodule,
+    statemodule,
     systemsoundbuttonmodule,
     visualizationmodule,
 }
