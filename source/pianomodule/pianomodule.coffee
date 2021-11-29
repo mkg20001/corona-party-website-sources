@@ -13,7 +13,7 @@ print = (arg) -> console.log(arg)
 audio = null
 
 numKeys = 12
-octave = 4
+octave = 2
 
 ############################################################
 keyCodeToIndex =
@@ -83,9 +83,9 @@ keyPressed = (evt) ->
 
 ############################################################
 keyReleased = (evt) ->
-    index = keyCodeToIndex[evt.keyCode]    
+    index = keyCodeToIndex[evt.keyCode]
     audio.setGainTo(index, 0.0) if index?
-    return    
+    return
 
 
 module.exports = pianomodule
