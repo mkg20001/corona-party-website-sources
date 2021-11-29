@@ -19,11 +19,12 @@ if not window.process
       setTimeout(c, 1)
   }
 
-#if allModules.debugmodule.modulesToDebug["peertopeermodule"]
-#  require('debug').save('*')
+if (require './debugmodule').default.modulesToDebug["peertopeermodule"]
+  require('debug').save('*')
+else
+  require('debug').save('')
 
 ############################################################
-require('debug').save('*')
 
 Libp2p = require('libp2p')
 WStar = require('libp2p-webrtc-star')
@@ -47,6 +48,20 @@ setText = (id, val) ->
   elem.innerHTML = ''
   elem.appendChild tnode
   return
+
+renderPeers = ->
+  elem = document.getElementById 'p2p-peers'
+  elem.innerHTML = ''
+
+  node.connectionManager.connections.forEach (conns, id) ->
+    console.log(conns, id)
+    conns.forEach (conn) ->
+      p = document.createElement 'p'
+      p.appendChild (
+        document.createTextNode conn.remoteAddr.toString()
+      )
+
+      elem.appendChild p
 
 ############################################################
 peertopeermodule.initialize = () ->
@@ -88,8 +103,8 @@ peertopeermodule.initialize = () ->
     # debugging and stuff
     window.p2p = node
 
-    #for id in node.connectionManager.connections.keys()
-    #  alert id
+    node.connectionManager.on 'peer:disconnect', renderPeers
+    node.connectionManager.on 'peer:connect', renderPeers
 
     setText('myid', peerId.toB58String())
 
