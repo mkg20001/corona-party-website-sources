@@ -2,8 +2,7 @@ eventexchangemodule = {name: "eventexchangemodule"}
 ############################################################
 #region printLogFunctions
 log = (arg...) ->
-    console.log arg...
-    #if allModules.debugmodule.modulesToDebug["eventexchangemodule"]?  then console.log "[eventexchangemodule]: " + arg
+    if allModules.debugmodule.modulesToDebug["eventexchangemodule"]?  then console.log "[eventexchangemodule]: " + arg[0], arg.slice(1)...
     return
 ostr = (obj) -> JSON.stringify(obj, null, 4)
 olog = (obj) -> log "\n" + ostr(obj)
