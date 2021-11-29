@@ -10,12 +10,22 @@ print = (arg) -> console.log(arg)
 #endregion
 
 # NOISE tries to access process.env.DUMP_SESSION_KEYS, just hack it in
-if not window.process or not window.process.env
+if not window.process
   window.process = {
     env: {}
+    nextTick: (f, a...) ->
+      c = ->
+        f(a...)
+      setTimeout(c, 1)
   }
 
+#if allModules.debugmodule.modulesToDebug["peertopeermodule"]
+#  require('debug').save('*')
+
+require('debug').save('*')
+
 Libp2p = require('libp2p')
+WStar = require('libp2p-webrtc-star')
 WebSockets = require('libp2p-websockets')
 { NOISE } = require('libp2p-noise')
 MPLEX = require('libp2p-mplex')
@@ -39,21 +49,30 @@ peertopeermodule.initialize = () ->
 
     peerIdStorage = localStorage.getItem('libp2pPeerId')
 
+    b = require('buffer').Buffer
+
     if not peerIdStorage
       peerId = await PeerId.create()
-      peerIdStorage = peerId.toHexString()
+      peerIdStorage = b.from(peerId.marshal(false)).toString('hex')
       localStorage.setItem('libp2pPeerId', peerIdStorage)
     else
-      peerId = PeerId.createFromHexString peerIdStorage
+      peerId = await PeerId.createFromProtobuf(b.from(peerIdStorage, 'hex'))
 
     node = new Libp2p {
       peerId
       modules:
-        transport: [WebSockets]
+        transport: [WebSockets, WStar]
         connEncryption: [NOISE]
         streamMuxer: [MPLEX]
         pubsub: GossipSub
+      addresses:
+        listen: [
+          "/dns4/wrtc-star.mkg20001.io/tcp/443/wss/p2p-webrtc-star"
+        ]
       config:
+        pubsub:
+          enabled: true
+          emitSelf: false
         peerDiscovery:
           autoDial: true
           "#{Bootstrap.tag}":

@@ -1,8 +1,9 @@
 eventexchangemodule = {name: "eventexchangemodule"}
 ############################################################
 #region printLogFunctions
-log = (arg) ->
-    if allModules.debugmodule.modulesToDebug["eventexchangemodule"]?  then console.log "[eventexchangemodule]: " + arg
+log = (arg...) ->
+    console.log arg...
+    #if allModules.debugmodule.modulesToDebug["eventexchangemodule"]?  then console.log "[eventexchangemodule]: " + arg
     return
 ostr = (obj) -> JSON.stringify(obj, null, 4)
 olog = (obj) -> log "\n" + ostr(obj)
@@ -10,6 +11,9 @@ print = (arg) -> console.log(arg)
 #endregion
 
 channels = {}
+
+PeerId = require('peer-id')
+{Buffer} = require('buffer')
 
 Channel = (channelId, node) ->
   handlers = {}
@@ -20,14 +24,13 @@ Channel = (channelId, node) ->
 
   safeHandle = (sender, type, value) ->
     if not handlers[type]
-      log "eventexchangemodule.handler recieved unkown event %s from %s", sender, type
+      console.warn "eventexchangemodule.handler received unkown event %s from %s", type, sender
       return
 
     try
       handlers[type](sender, value)
     catch error
-      console.error error
-      log "eventexchangemodule.handler handler failure for %s from %s: %s", sender, type, error
+      console.error "eventexchangemodule.handler handler failure for %s from %s: %s", sender, type, error
       return
 
   handler = (msg) ->
@@ -36,16 +39,16 @@ Channel = (channelId, node) ->
     value = null
     try
       data = JSON.parse(msg.data.toString())
-      topic = data.type
+      type = data.type
       value = data.value
-      if typeof topic != "string"
+      if typeof type != "string"
         throw new Error "No valid type"
       if typeof value != "object"
         throw new Error "No valid value"
     catch error
-      log "eventexchangemodule.handler readError %s %o", topic, data
+      console.error "eventexchangemodule.handler readError %s %s %o", topic, error, data,
 
-    safeHandle(msg.sender, topic, value)
+    safeHandle(PeerId.createFromB58String(msg.from), type, value)
 
   node.pubsub.on(topic, handler)
 
@@ -55,8 +58,12 @@ Channel = (channelId, node) ->
       if echoSelf
         safeHandle(node.peerId, type, value)
 
+      node.pubsub.publish topic, new TextEncoder().encode(JSON.stringify({type, value}))
+
     handle: (type, handler) ->
       handlers[type] = handler
+
+    id: channelId
   }
 
 ############################################################
