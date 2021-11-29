@@ -18,8 +18,6 @@ print = (arg) -> console.log(arg)
 nick = window.localStorage.getItem('chat.nick')
 present = {}
 channel = null
-chatInput = null
-chatForm = null
 day = require 'dayjs'
 relativeTime = require('dayjs/plugin/relativeTime')
 day.extend(relativeTime)
@@ -53,14 +51,13 @@ presence = setInterval(showPresence, 1000)
 
 
 render = ->
-  msgsOut = document.getElementById "chat-messages"
-  msgsOut.innerHTML = ''
+  chatMessages.innerHTML = ''
 
   for msg in messages
     txt = document.createTextNode("<#{msg.nick || "(unnamed)"} - #{msg.sender}> #{msg.msg}")
     p = document.createElement "p"
     p.appendChild txt
-    msgsOut.appendChild p
+    chatMessages.appendChild p
 
 renderPresence = ->
   pOut = document.getElementById "chat-present"
@@ -116,8 +113,6 @@ chatkeypress = () ->
 ############################################################
 chatmodule.initialize = () ->
     log "chatmodule.initialize"
-    chatInput = document.getElementById "chat-input"
-    chatForm = document.getElementById "chat-form"
     chatForm.onsubmit = (e) ->
       e.preventDefault()
       chatkeypress()
