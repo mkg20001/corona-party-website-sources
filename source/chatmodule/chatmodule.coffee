@@ -137,6 +137,8 @@ chatmodule.start = (channelId) ->
     channel.handle "chat.presence", handlerPresence
     sysmsg "Connected via pubsub to #{channelId} as #{nick || '(unnamed)'}"
     chatInput.disabled = false
+    # call immediatly, this looks better
+    showPresence()
 
 chatmodule.chat = (msg) ->
     if not channel

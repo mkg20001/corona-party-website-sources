@@ -58,6 +58,8 @@ peertopeermodule.initialize = () ->
     else
       peerId = await PeerId.createFromProtobuf(b.from(peerIdStorage, 'hex'))
 
+    p2pConfig = allModules.configmodule.p2p || {}
+
     node = new Libp2p {
       peerId
       modules:
@@ -66,9 +68,7 @@ peertopeermodule.initialize = () ->
         streamMuxer: [MPLEX]
         pubsub: GossipSub
       addresses:
-        listen: [
-          "/dns4/wrtc-star.mkg20001.io/tcp/443/wss/p2p-webrtc-star"
-        ]
+        listen: p2pConfig.listenAddrs || []
       config:
         pubsub:
           enabled: true
@@ -77,7 +77,7 @@ peertopeermodule.initialize = () ->
           autoDial: true
           "#{Bootstrap.tag}":
             enabled: true
-            list: allModules.configmodule.p2pBootstrapPeers || []
+            list: p2pConfig.bootstrapPeers || []
     }
 
     await node.start()
