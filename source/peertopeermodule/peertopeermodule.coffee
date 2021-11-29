@@ -49,7 +49,7 @@ setText = (id, val) ->
   return
 
 ############################################################
-peertopeermodule.initialize = () ->
+peertopeermodule.initialize = ->
     log "peertopeermodule.initialize"
 
     peerIdStorage = localStorage.getItem('libp2pPeerId')

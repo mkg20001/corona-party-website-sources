@@ -16,7 +16,7 @@ configmodule.initialize = ->
 
 ########################################################
 #region exposedProperties
-configmodule.prop = true
+configmodule.partyId = "12345"
 configmodule.appId = 'corona-party'
 configmodule.p2p = {
   bootstrapPeers: [
