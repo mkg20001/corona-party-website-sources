@@ -16,7 +16,7 @@ partyId = '123456'
 startupmodule.initialize = ->
     log "startupmodule.initialize"
     c = allModules.configmodule
-    
+
     queryString = window.location.search
     urlParams = new URLSearchParams(queryString)
     urlId = urlParams.get("partyId")
@@ -25,6 +25,7 @@ startupmodule.initialize = ->
     return
 
 
+############################################################
 startupmodule.startUp = ->
     allModules.audioanalysermodule.start()
     # analyser = allModules.audioanalysermodule.getAnalyser()
