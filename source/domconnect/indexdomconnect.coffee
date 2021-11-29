@@ -10,6 +10,7 @@ indexdomconnect.initialize = () ->
     global.chatForm = document.getElementById("chat-form")
     global.chatInput = document.getElementById("chat-input")
     global.micbutton = document.getElementById("micbutton")
+    global.background = document.getElementById("background")
     return
     
 module.exports = indexdomconnect

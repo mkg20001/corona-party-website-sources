@@ -22,6 +22,7 @@ if not window.process
 #if allModules.debugmodule.modulesToDebug["peertopeermodule"]
 #  require('debug').save('*')
 
+############################################################
 require('debug').save('*')
 
 Libp2p = require('libp2p')
@@ -34,6 +35,9 @@ Bootstrap = require('libp2p-bootstrap')
 FloodSub = require('libp2p-floodsub')
 GossipSub = require('libp2p-gossipsub')
 
+b = require('buffer').Buffer
+
+############################################################
 node = null
 
 setText = (id, val) ->
@@ -42,14 +46,13 @@ setText = (id, val) ->
   elem = document.getElementById('p2p-' + id)
   elem.innerHTML = ''
   elem.appendChild tnode
+  return
 
 ############################################################
 peertopeermodule.initialize = () ->
     log "peertopeermodule.initialize"
 
     peerIdStorage = localStorage.getItem('libp2pPeerId')
-
-    b = require('buffer').Buffer
 
     if not peerIdStorage
       peerId = await PeerId.create()

@@ -1,6 +1,7 @@
 import audioanalysermodule from "./audioanalysermodule"
 import audiomodule from "./audiomodule"
 import authoritysymbolmodule from "./authoritysymbolmodule"
+import backgroundmodule from "./backgroundmodule"
 import chatmodule from "./chatmodule"
 import configmodule from "./configmodule"
 import dancingvirusmodule from "./dancingvirusmodule"
@@ -10,6 +11,7 @@ import micbuttonmodule from "./micbuttonmodule"
 import peertopeermodule from "./peertopeermodule"
 import pianomodule from "./pianomodule"
 import startupmodule from "./startupmodule"
+import statemodule from "./statemodule"
 import systemsoundbuttonmodule from "./systemsoundbuttonmodule"
 import visualizationmodule from "./visualizationmodule"
 
@@ -17,6 +19,7 @@ Modules = {
     audioanalysermodule,
     audiomodule,
     authoritysymbolmodule,
+    backgroundmodule,
     chatmodule,
     configmodule,
     dancingvirusmodule,
@@ -26,6 +29,7 @@ Modules = {
     peertopeermodule,
     pianomodule,
     startupmodule,
+    statemodule,
     systemsoundbuttonmodule,
     visualizationmodule,
 }
