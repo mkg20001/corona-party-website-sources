@@ -7,9 +7,12 @@ import configmodule from "./configmodule"
 import dancingvirusmodule from "./dancingvirusmodule"
 import debugmodule from "./debugmodule"
 import eventexchangemodule from "./eventexchangemodule"
+import messageboxmodule from "./messageboxmodule"
 import micbuttonmodule from "./micbuttonmodule"
 import peertopeermodule from "./peertopeermodule"
 import pianomodule from "./pianomodule"
+import qrdisplaymodule from "./qrdisplaymodule"
+import qrreadermodule from "./qrreadermodule"
 import startupmodule from "./startupmodule"
 import statemodule from "./statemodule"
 import systemsoundbuttonmodule from "./systemsoundbuttonmodule"
@@ -25,9 +28,12 @@ Modules = {
     dancingvirusmodule,
     debugmodule,
     eventexchangemodule,
+    messageboxmodule,
     micbuttonmodule,
     peertopeermodule,
     pianomodule,
+    qrdisplaymodule,
+    qrreadermodule,
     startupmodule,
     statemodule,
     systemsoundbuttonmodule,

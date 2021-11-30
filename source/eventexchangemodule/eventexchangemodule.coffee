@@ -19,7 +19,8 @@ Channel = (channelId, node) ->
 
   topic = "#{allModules.configmodule.appId}.#{channelId}"
 
-  await node.pubsub.subscribe topic
+  try await node.pubsub.subscribe topic
+  catch err then log err
 
   safeHandle = (sender, type, value) ->
     if not handlers[type]

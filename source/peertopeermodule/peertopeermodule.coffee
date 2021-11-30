@@ -98,15 +98,16 @@ peertopeermodule.initialize = ->
             list: p2pConfig.bootstrapPeers || []
     }
 
-    await node.start()
+    try 
+        await node.start()
+        # debugging and stuff
+        window.p2p = node
 
-    # debugging and stuff
-    window.p2p = node
+        node.connectionManager.on 'peer:disconnect', renderPeers
+        node.connectionManager.on 'peer:connect', renderPeers
 
-    node.connectionManager.on 'peer:disconnect', renderPeers
-    node.connectionManager.on 'peer:connect', renderPeers
-
-    setText('myid', peerId.toB58String())
+        setText('myid', peerId.toB58String())
+    catch err then log err
 
     return
 
