@@ -1,7 +1,7 @@
 debugmodule = {name: "debugmodule", uimodule: false}
 
 ############################################################
-debugmodule.modulesToDebug = 
+export modulesToDebug =
     unbreaker: true
     # audioanalysermodule: true
     audiomodule: true
@@ -9,5 +9,3 @@ debugmodule.modulesToDebug =
     # pianomodule: true
     systemsoundbuttonmodule: true
     # visualizationmodule: true
-
-export default debugmodule
