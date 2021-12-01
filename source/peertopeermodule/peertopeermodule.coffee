@@ -19,7 +19,7 @@ if not window.process
       setTimeout(c, 1)
   }
 
-if (require './debugmodule').default.modulesToDebug["peertopeermodule"]
+if (require './debugmodule').modulesToDebug["peertopeermodule"]
   require('debug').save('*')
 else
   require('debug').save('')
@@ -35,8 +35,9 @@ PeerId = require('peer-id')
 Bootstrap = require('libp2p-bootstrap')
 FloodSub = require('libp2p-floodsub')
 GossipSub = require('libp2p-gossipsub')
+TransportManager = require('libp2p/src/transport-manager')
 
-b = require('buffer').Buffer
+{ Buffer } = require('buffer')
 
 ############################################################
 node = null
@@ -54,7 +55,6 @@ renderPeers = ->
   elem.innerHTML = ''
 
   node.connectionManager.connections.forEach (conns, id) ->
-    console.log(conns, id)
     conns.forEach (conn) ->
       p = document.createElement 'p'
       p.appendChild (
@@ -64,17 +64,17 @@ renderPeers = ->
       elem.appendChild p
 
 ############################################################
-peertopeermodule.initialize = ->
+export initialize = ->
     log "peertopeermodule.initialize"
 
     peerIdStorage = localStorage.getItem('libp2pPeerId')
 
     if not peerIdStorage
       peerId = await PeerId.create()
-      peerIdStorage = b.from(peerId.marshal(false)).toString('hex')
+      peerIdStorage = Buffer.from(peerId.marshal(false)).toString('hex')
       localStorage.setItem('libp2pPeerId', peerIdStorage)
     else
-      peerId = await PeerId.createFromProtobuf(b.from(peerIdStorage, 'hex'))
+      peerId = await PeerId.createFromProtobuf(Buffer.from(peerIdStorage, 'hex'))
 
     p2pConfig = allModules.configmodule.p2p || {}
 
@@ -87,6 +87,8 @@ peertopeermodule.initialize = ->
         pubsub: GossipSub
       addresses:
         listen: p2pConfig.listenAddrs || []
+      transportManager:
+        faultTolerance: TransportManager.FaultTolerance.NO_FATAL
       config:
         pubsub:
           enabled: true
@@ -98,24 +100,20 @@ peertopeermodule.initialize = ->
             list: p2pConfig.bootstrapPeers || []
     }
 
-    try 
-        await node.start()
-        # debugging and stuff
-        window.p2p = node
+    await node.start()
+    # debugging and stuff
+    window.p2p = node
 
-        node.connectionManager.on 'peer:disconnect', renderPeers
-        node.connectionManager.on 'peer:connect', renderPeers
+    node.connectionManager.on 'peer:disconnect', renderPeers
+    node.connectionManager.on 'peer:connect', renderPeers
 
-        setText('myid', peerId.toB58String())
-    catch err then log err
+    setText('myid', peerId.toB58String())
 
     return
 
-peertopeermodule.getNode = ->
+export getNode = ->
   if !node
     # TODO: return promise that will resolve to node
     throw new Error('Couldnt get node, not initialized yet')
 
   return node
-
-module.exports = peertopeermodule

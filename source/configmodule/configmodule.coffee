@@ -10,15 +10,15 @@ print = (arg) -> console.log(arg)
 #endregion
 
 ########################################################
-configmodule.initialize = ->
+export initialize = ->
     log "configmodule.initialize"
     return
 
 ########################################################
 #region exposedProperties
-configmodule.partyId = "12345"
-configmodule.appId = 'corona-party'
-configmodule.p2p = {
+export partyId = "12345"
+export appId = 'corona-party'
+export p2p = {
   bootstrapPeers: [
     # libp2p peers to connect to
 
@@ -39,5 +39,3 @@ configmodule.p2p = {
 }
 
 #endregion
-
-export default configmodule

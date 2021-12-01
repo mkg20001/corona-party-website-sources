@@ -32,35 +32,11 @@ objectStorage = []
 
 cuteVirus = null
 
-svgToImage = (id) ->
-  # get svg
-  svg = document.getElementById(id)
-
-  # make image
-  img = new Image()
-
-  # get svg data
-  xml = new XMLSerializer().serializeToString(svg)
-
-  # make it base64
-  svg64 = btoa(xml)
-  b64Start = 'data:image/svg+xml;base64,'
-
-  # prepend a "header"
-  image64 = b64Start + svg64;
-
-  img.isReady = false
-  img.src = image64
-  img.onload = ->
-    img.isReady = true
-
-  img
-
 ############################################################
 colors = [
     {
         r: 255
-        g: 0 
+        g: 0
         b: 0
         hex: "#ff0000"
     },
@@ -72,7 +48,7 @@ colors = [
     },
     {
         r: 255
-        g: 255 
+        g: 255
         b: 0
         hex: "#FFFF00"
     },
@@ -84,13 +60,13 @@ colors = [
     },
     {
         r: 195
-        g: 242 
+        g: 242
         b: 255
         hex: "#C3F2FF"
     },
     {
         r: 142
-        g: 201 
+        g: 201
         b: 255
         hex: "#ff0000"
     },
@@ -102,7 +78,7 @@ colors = [
     },
     {
         r: 144
-        g: 0 
+        g: 0
         b: 255
         hex: "#9000FF"
     },
@@ -126,18 +102,16 @@ colors = [
     },
     {
         r: 171
-        g: 0 
+        g: 0
         b: 52
         hex: "#AB0034"
     }
 ]
 
 ############################################################
-visualizationmodule.initialize = ->
+export initialize = ->
     log "visualizationmodule.initialize"
     analyser = allModules.audioanalysermodule
-
-    cuteVirus = svgToImage('cute-virus')
 
     ctx = visualsCanvas.getContext("2d")
     visualsCanvas.width = WIDTH
@@ -333,7 +307,10 @@ drawSoundColoredRect = (data) ->
 
 
 ############################################################
-visualizationmodule.start = ->
+export start = ->
+    cuteVirus = allModules.svgiconsmodule.svgToImage 'cute-virus'
+
+
     bufferLength = analyser.getBufferLength()
 
     barWidth = (WIDTH / bufferLength) * 2.5
@@ -353,7 +330,4 @@ visualizationmodule.start = ->
     visualizationUpdate()
     return
 
-visualizationmodule.newVirusObject = ->
-
-
-module.exports = visualizationmodule
+export newVirusObject = ->
