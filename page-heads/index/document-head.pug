@@ -2,12 +2,32 @@ doctype html
 html(lang="en")
     head
         meta(charset='utf-8')
-        title Sample Page Head
-        meta(name='description', content='Sample Description in the Sample Page Head')
-        link(rel='manifest' href='sample-manifest.json')
         
-        link(rel='icon' href='favicon.ico')
-        link(rel='apple-touch-icon' sizes='180x180' href='img/sample-icon.png')
+        //- Title and Description
+        title Corona Party!        
+        meta(name='description', content='Website to ridicule the authoritarianistic response to the novel corona virus. Especially the delusions about control turning to thought control and the disturbing lack of sensitivity and reason therein - At least you may do party at home! Cheers! Enjoy!')
+        
+        //- Open Graph meta Tags
+        meta(property='og:image' content="https://corona-party.weblenny.at/android-chrome-512x512.png")
+        meta(property='og:title' content="Corona Party!")
+        meta(property='og:description' content='Website to ridicule the authoritarianistic response to the novel corona virus. Especially the delusions about control turning to thought control and the disturbing lack of sensitivity and reason therein - At least you may do party at home! Cheers! Enjoy!')
+        meta(property='og:type' content="website")
+        meta(property='og:url' content="https://corona-party.weblenny.at")
+        meta(property='og:locale' content="en_US")
+        
+        //- Manifest
+        link(rel='manifest' href='manifest.json')
+        
+        //- Favicon
+        link(rel="icon", type="image/png", sizes="32x32", href="/favicon-32x32.png")
+        link(rel="icon", type="image/png", sizes="16x16", href="/favicon-16x16.png")
+        link(rel="apple-touch-icon", sizes="180x180", href="/apple-touch-icon.png")
+        link(rel="mask-icon", href="/safari-pinned-tab.svg", color="#5bbad5")
+        
+        meta(name="msapplication-TileColor", content="#da532c")
+        meta(name="theme-color", content="#ffffff")
+
+        //- Screen
         meta(name='viewport', content='width=device-width, initial-scale=1.0')
         
         include styles-include.pug
