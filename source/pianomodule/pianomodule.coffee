@@ -9,9 +9,18 @@ olog = (obj) -> log "\n" + ostr(obj)
 print = (arg) -> console.log(arg)
 #endregion
 
+# TODO: to counteract latency include timestamp slightly in the future and have nodes play back the event at an exact timestamp
+# that creates delay but also harmony. might also be bad cause not real time and stuff
+
 ############################################################
 audio = null
 
+# global
+devicesPerUser = {}
+highestOctave = 12
+channel = null
+
+# local
 numKeys = 12
 octave = 4
 
@@ -47,45 +56,80 @@ baseFrequencies = [
 ]
 
 ############################################################
-pianomodule.initialize = () ->
+export initialize = () ->
     log "pianomodule.initialize"
     audio = allModules.audiomodule
-    createDevices()
 
     piano.addEventListener("click", startPiano)
     piano.addEventListener("keydown", keyPressed)
     piano.addEventListener("keyup", keyReleased)
+
+    setInterval(cleanup, 1000)
+
     return
+
+export start = (channelId) ->
+    channel = await allModules.eventexchangemodule.channel channelId
+    channel.handle "piano", handler
 
 ############################################################
 createDevices = ->
-    i = 0
-    while(i < numKeys)
-        freq = baseFrequencies[i]
-        freq = freq * Math.pow(2, octave)
-        j = audio.createSineOscillator(freq)
-        i++
-        throw new Error("Unexpected Index on Oscillator create for Piano!") unless i == j
+    device = {
+      o: {}
+    }
 
-    return
+    i = 0
+    while(i < highestOctave)
+      i2 = 0
+      e = []
+      device.o[i] = e
+      while(i2 < numKeys)
+          freq = baseFrequencies[i2]
+          freq = freq * Math.pow(2, i)
+          e.push(audio.createSineOscillator(freq))
+          i2++
+      i++
+
+    audio.startAllOscillators()
+
+    device
 
 ############################################################
 startPiano = ->
     log "startPiano"
-    audio.startAllOscillators()
+    # audio.startAllOscillators()
     return
 
 ############################################################
 keyPressed = (evt) ->
     index = keyCodeToIndex[evt.keyCode]
-    audio.setGainTo(index, 0.2) if index?
+    channel.emit "piano", {octave, index, release: false} if index?
     return
 
 ############################################################
 keyReleased = (evt) ->
     index = keyCodeToIndex[evt.keyCode]
-    audio.setGainTo(index, 0.0) if index?
+    channel.emit "piano", {octave, index, release: true} if index?
     return
 
+handler = (sender, evt) ->
+    id = sender.toB58String()
 
-module.exports = pianomodule
+    if not devicesPerUser[id]
+        log "creating device for %s", id
+        devicesPerUser[id] = createDevices()
+
+    devicesPerUser[id].lastSeen = Date.now()
+
+    if not devicesPerUser[id].o[evt.octave]
+        return
+
+    audio.setGainTo(devicesPerUser[id].o[evt.octave][evt.index], if evt.release then 0.0 else 0.2)
+
+cleanup = () ->
+    for id, state of devicesPerUser
+      # clear up all old
+      if state.lastSeen && Date.now() - state.lastSeen > 30 * 1000
+        delete state.lastSeen
+        for oct, oscils of state.o
+          audio.setGainTo(oscil, 0.0) for oscil in oscils

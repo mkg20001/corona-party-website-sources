@@ -33,6 +33,7 @@ startupmodule.startUp = ->
     allModules.visualizationmodule.start()
 
     allModules.chatmodule.start partyId
+    allModules.pianomodule.start partyId
 
     return
 

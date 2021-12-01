@@ -18,12 +18,12 @@ oscillators = []
 gains = []
 analyser = null
 
-mic = null 
+mic = null
 micGain = null
 micFilter = null
 micConvolver = null
 
-systemSound = null 
+systemSound = null
 systemSoundGain = null
 # micFilter = null
 # micConvolver = null
@@ -45,7 +45,7 @@ audiomodule.createSineOscillator = (freq) ->
     g.gain.setValueAtTime(0, ctx.currentTime)
 
     osc.frequency.value = freq
-    
+
     osc.connect(g)
     g.connect(ctx.destination)
     # osc.start()
@@ -57,17 +57,17 @@ audiomodule.createSineOscillator = (freq) ->
 
 ############################################################
 audiomodule.startAllOscillators = ->
-    return if oscillatorsRunning
+    # return if oscillatorsRunning
     osc.start() for osc in oscillators
-    oscillatorsRunning = true
+    # oscillatorsRunning = true
     return
 
 ############################################################
 audiomodule.setGainTo = (index, volume) ->
     g = gains[index]
-    throw new Error("No gain found for index: " + index) unless g?    
+    throw new Error("No gain found for index: " + index) unless g?
     g.gain.setValueAtTime(volume, ctx.currentTime)
-    
+
     # g.gain.exponentialRampToValueAtTime(0.1, ctx.currentTime)
     # g.gain.setValueAtTime(0.2, ctx.currentTime)
     # g.gain.exponentialRampToValueAtTime(0.0000001, ctx.currentTime+0.2)
@@ -107,13 +107,13 @@ audiomodule.destroyMic = ->
     log "audiomodule.destroyMic"
     log "Not Implemented yet!"
     return
-    
+
 ############################################################
 audiomodule.createSystemSound = ->
     log "audiomodule.createSystemSound"
 
     systemSoundGain = ctx.createGain()
-    
+
     constraintsMoz = {
         audio: {
            mediaSource: 'audioCapture'
@@ -123,7 +123,7 @@ audiomodule.createSystemSound = ->
         audio: {
             mandatory: {
                 chromeMediaSource: 'system',
-            }        
+            }
         }
     }
 
@@ -151,5 +151,5 @@ audiomodule.destroySystemSound = ->
     log "Not Implemented yet!"
     return
 
-    
+
 module.exports = audiomodule
