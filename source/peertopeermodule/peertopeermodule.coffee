@@ -35,6 +35,7 @@ PeerId = require('peer-id')
 Bootstrap = require('libp2p-bootstrap')
 FloodSub = require('libp2p-floodsub')
 GossipSub = require('libp2p-gossipsub')
+TransportManager = require('libp2p/src/transport-manager')
 
 { Buffer } = require('buffer')
 
@@ -86,6 +87,8 @@ export initialize = ->
         pubsub: GossipSub
       addresses:
         listen: p2pConfig.listenAddrs || []
+      transportManager:
+        faultTolerance: TransportManager.FaultTolerance.NO_FATAL
       config:
         pubsub:
           enabled: true
